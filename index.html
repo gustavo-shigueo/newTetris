@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head>
+    <script src="p5.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.min.css">
+    <meta charset="utf-8">
+
+  </head>
+  <body>
+  
+    <p>Press C to hold a piece, spacebar to go down instantly and arrow to move / rotate</p>
+    <br>
+    <div class="gameover-screen" data-gameover-screen="hide">
+      <div class="wrapper">
+        <h3 class="gameover-msg">Game Over!</h3>
+        <button class="gameover-btn" id="gameover-btn">Restart</button>
+      </div>
+    </div>
+    <span class="scoreboard">
+      <i></i><i></i>
+      <h2 id="score" style="font-family: arial, sans-serif; margin: 0">Score: </h2>
+      <h2 id="highscore" style="font-family: arial, sans-serif; margin: 0">Highscore: </h2>
+      <i></i><i></i>
+    </span>
+    <script src="sketch.js"></script>
+    <script src="constants.js"></script>
+    <script src="gameScreen.js"></script>
+    <script src="board.js"></script>
+    <script src="piece.js"></script>
+
+  </body>
+</html>
