@@ -1,4 +1,4 @@
-# newTetris
+# Tetris v2
 This is my second attempt at creating a game of tetris, and I am very happy with the results!
 So here is what's changed:
 
