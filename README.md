@@ -2,12 +2,12 @@
 This is my second attempt at creating a game of tetris, and I am very happy with the results!
 So here is what's changed:
 
-##Bug fixes: \n
+##Bug fixes:
 *Clearing lines behavior is no longer wrong
 *Rotation related bugs have been fixed
 
-##Code improvements and features
-*Colors
+##Code improvements and features:
+*Colors added
 *Hard drop readded
 *Code is much cleaner than in v1
 *OOP has been better implemented
