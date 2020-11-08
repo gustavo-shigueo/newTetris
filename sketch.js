@@ -1,22 +1,22 @@
+// ? Setting default start values
 function setup() {
-  createCanvas(wC, hC);
-  frameRate(f)
+  createCanvas(widthCanvas, heigthCanvas);
+  frameRate(framerate)
 
   next()
   holding = false
   heldPiece = null
   piece = new Piece()
   board = new Board()
-
-  // noLoop()
 }
 
+// ? Runs every frame
 function draw() {
   background(0);
   if (keyIsDown(DOWN_ARROW) && !piece.checkDownWardsCollision()) piece.update()
   if(!piece.checkDownWardsCollision()) piece.update()
   else {
-    if (board.places.some(v => v[2] === 0)) {
+    if (board.usedPlaces.some(v => v[2] === 0)) {
       gameOver()
       highscore = max(score, highscore)
       noLoop()
@@ -34,12 +34,12 @@ function draw() {
   push()
     fill(255)
     textSize(20)
-    text('Next:', 12 * g, 1.5 * g)
-    text('Hold:', 12 * g, 12.5 * g)
+    text('Next:', 12 * gridSize, 1.5 * gridSize)
+    text('Hold:', 12 * gridSize, 12.5 * gridSize)
     stroke(255)
     noFill()
-    square(12 * g, 2 * g, 5 * g)
-    square(12 * g, 13 * g, 5 * g)
+    square(12 * gridSize, 2 * gridSize, 5 * gridSize)
+    square(12 * gridSize, 13 * gridSize, 5 * gridSize)
   pop()
   showScore()
 }

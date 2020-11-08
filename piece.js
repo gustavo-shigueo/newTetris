@@ -1,117 +1,152 @@
 class Piece {
-    constructor(pieceIndex = nextPieceIndex, x, y) {
-        this.x = x || (w - 2 * g) / 2
-        this.y = y || -4 * g
-        this.pieceIndex = pieceIndex !== null ? pieceIndex : floor(random(0, 7))
-        if (this.pieceIndex === 7) this.pieceIndex = 6
-        this.piece = pieces[this.pieceIndex]
-        this.matrix = this.piece.matrix
-        this.len = this.matrix.length
-        this.acceptedMoves = {
-            'ArrowLeft': 'left',
-            'ArrowRight': 'right',
-            'ArrowUp': 'up',
-            ' ': 'spacebar',
-            'c': 'hold'
-        }
-    }
+	constructor(pieceIndex = nextPieceIndex, x, y) {
+		// ? Position of the current piece
+		this.x = x || (widthBoard - 2 * gridSize) / 2
+		this.y = y || -4 * gridSize
 
-    show() {
-        fill(this.piece.color)
-        for (let row = 0; row < this.len; row++)
-            for (let col = 0; col < this.len; col++)
-                if (this.matrix[row][col]) square(this.x + col * g, this.y + row * g, g)
-    }
-    
-    update() {
-        this.y += g
-        return
-    }
+		// ? Type of piece (check pieces in constants.js for reference)
+		this.pieceIndex = pieceIndex !== null ? pieceIndex : floor(random(0, 7))
+		if (this.pieceIndex === 7) this.pieceIndex = 6
+		this.piece = pieces[this.pieceIndex]
 
-    checkDownWardsCollision() {
-        for (let row = 0; row < this.len; row++) {
-            if (this.matrix[row].some(v => v === 1) && this.y + row * g >= h - g)
-                return true
-            for (let col = 0; col < this.len; col++)
-                if (board.places.some(
-                    v => v[1] === this.x + col * g && v[2] === this.y + (row + 1) * g
-                ) && this.matrix[row][col]) return true
-        }
-        return
-    }
+		// ? Shortcut variables to avoid typing 'this.piece.matrix' and 'this.piece.matrix.length' all over the file
+		this.matrix = this.piece.matrix
+		this.len = this.matrix.length
 
-    collideDownWards() {
-        for (let row = 0; row < this.len; row++)
-            for (let col = 0; col < this.len; col++) 
-                if (this.matrix[row][col] && !board.places.some(v => v[1] === this.x + col * g && v[2] === this.y + row * g))
-                    board.places.push([pieces[this.pieceIndex], this.x + col * g, this.y + row * g])
-        return true
-    }
+		// ? Input filter
+		this.acceptedMoves = {
+			'ArrowLeft': 'left',
+			'ArrowRight': 'right',
+			'ArrowUp': 'up',
+			' ': 'spacebar',
+			'c': 'hold'
+		}
+	}
 
-    receiveInput(key) {
-        if (!this.acceptedMoves[key]) return
-        let movement = this.acceptedMoves[key]
-        switch (movement) {
-            case 'right':
-            case 'left':
-                if (this.possibleToMove(movement)) this.move(movement)
-                break
-            case 'up':
-                this.rotate()
-                break
-            case 'spacebar':
-                while (!this.checkDownWardsCollision()) draw()
-                break
-            case 'hold':
-                this.hold()
-                break
-            default: return
-        }
-    }
+	show() {
+		fill(this.piece.color)
+		for (let row = 0; row < this.len; row++)
+			for (let col = 0; col < this.len; col++)
+				if (this.matrix[row][col]) square(this.x + col * gridSize, this.y + row * gridSize, gridSize)
+	}
 
-    possibleToMove(movement) {
-        for (let row = 0; row < this.len; row++)
-            for (let col = 0; col < this.len; col++) {
-                if (movement === 'left' && this.matrix[row][col] && (this.x + col * g === 0 || board.places.some(v => v[1] === this.x + (col - 1) * g && v[2] === this.y + row * g))) return
-                if (movement === 'right')
-                    if (this.matrix[row][col] && (this.x + col * g === w - g || board.places.some(v => v[1] === this.x + (col + 1) * g && v[2] === this.y + row * g))) return
-            }
-        return true
-    }
+	update() {
+		this.y += gridSize
+		return
+	}
 
-    move(movement) {
-        if (movement === 'left') this.x -= g
-        if (movement === 'right') this.x += g
-    }
+	checkDownWardsCollision() {
+		for (let row = 0; row < this.len; row++) {
+			// ? Conditional to check if any rows of the matrix that contain a value of 1 have reached the bottom of the board
+			if (this.matrix[row].some(square => !!square) && this.y + row * gridSize >= heightBoard - gridSize)
+				return true
+			for (let col = 0; col < this.len; col++){
+				const collisionIsHappening = board.usedPlaces.some(
+					place => place[1] === this.x + col * gridSize && // ? Checks if your piece has the same x value as any particular place
+					place[2] === this.y + (row + 1) * gridSize       // ? and is directly above that place
+				)
+				if (collisionIsHappening && this.matrix[row][col]) return true
+			}
+		}
+		return
+	}
 
-    rotate() {
-        let rotatedMatrix = []
-        for (let row = 0; row < this.len; row++) {
-            rotatedMatrix.push(Array(this.len))
-            let k = this.len - 1
-            for (let col = 0; col < this.len; col++) {
-                rotatedMatrix[row][col] = this.matrix[k][row]
-                k--
-            }
-        }
-        for (let row = 0; row < this.len; row++)
-            for (let col = 0; col < this.len; col++) {
-                if (rotatedMatrix[row][col]){
-                    // ? Checks if rotation causes the piece to collide with other pieces or the floor
-                    if (this.y + row * g === h - 2 * g || board.places.some(v => v[1] === this.x + col * g && v[2] === this.y + (row - 1) * g)) return 
-                    if (this.x + col * g <= 0) this.x = 0
-                    else if (this.x + col * g >= w - g) this.x = w - rotatedMatrix.length * g
-                }
-            }
-        // ? Rotation didn't cause problems
-        this.y -= g
-        return this.matrix = rotatedMatrix
-    }
+	collideDownWards() {
+		for (let row = 0; row < this.len; row++)
+			for (let col = 0; col < this.len; col++) 
+				if (this.matrix[row][col])
+					// ? Adds the current matrix[row][col] to boards.usedPlaces
+					board.usedPlaces.push([
+						pieces[this.pieceIndex], // ? Allows the board object apply the right color
+						this.x + col * gridSize, // ? X position
+						this.y + row * gridSize  // ? Y position
+					])
+		return true
+	}
 
-    hold() {
-        heldPieceIndex = this.pieceIndex
-        if (holding) return
-        held()
-        holding = true
-    }
+	receiveInput(key) {
+		if (!this.acceptedMoves[key]) return
+		let movement = this.acceptedMoves[key]
+		switch (movement) {
+			case 'right':
+			case 'left':
+				if (this.possibleToMove(movement)) this.move(movement)
+				break
+			case 'up':
+				this.rotate()
+				break
+			case 'spacebar':
+				while (!this.checkDownWardsCollision()) draw()
+				break
+			case 'hold':
+				this.hold()
+				break
+			default: return
+		}
+	}
+
+	possibleToMove(movement) {
+		for (let row = 0; row < this.len; row++)
+			for (let col = 0; col < this.len; col++) {
+				if (!this.matrix[row][col]) continue
+				const direction = movement === 'right' ? 1 : -1
+				const moveIsBlocked = board.usedPlaces.some(
+					place => place[1] === this.x + (col + direction) * gridSize && place[2] === this.y + row * gridSize
+				)
+				const moveHitsWall = this.x + col * gridSize === (movement === 'right' ? widthBoard - gridSize : 0)
+				if (moveHitsWall || moveIsBlocked) return
+			}
+		return true
+	}
+
+	move(movement) {
+		if (movement === 'left') this.x -= gridSize
+		if (movement === 'right') this.x += gridSize
+	}
+
+	rotate() {
+		let rotatedMatrix = []
+		
+		// ? Adds a copy this.matrix rotated 90 degrees to the right to rotatedMatrix
+		// ? This process does not affect this.matrix
+		for (let row = 0; row < this.len; row++) {
+			rotatedMatrix.push(Array(this.len))
+			let k = this.len - 1
+			for (let col = 0; col < this.len; col++) {
+					rotatedMatrix[row][col] = this.matrix[k][row]
+					k--
+			}
+		}
+
+		// ? Checks if rotatedMatrix is in a valid position
+		for (let row = 0; row < this.len; row++)
+			for (let col = 0; col < this.len; col++) {
+				// ? Only run the tests below if rotatedMatrix is truthy
+				if (!rotatedMatrix[row][col]) continue
+
+				// ? Checks if rotation causes the piece to collide with other pieces or the floor
+				const isGoingThroughFloor = this.y + row * gridSize === heightBoard - 2 * gridSize
+				const isGoingThroughPlace = board.usedPlaces.some(
+					place => place[1] === this.x + col * gridSize && place[2] === this.y + (row - 1) * gridSize
+				)
+
+				// ? If any of the tests return true, abort the rotation
+				if (isGoingThroughFloor || isGoingThroughPlace) return
+
+				// ? Prevents rotation from causing the piece to go through walls
+				if (this.x + col * gridSize <= 0) this.x = 0
+				else if (this.x + col * gridSize >= widthBoard - gridSize) this.x = widthBoard - rotatedMatrix.length * gridSize
+			}
+
+		// ? Rotation didn't cause problems
+		this.y -= gridSize
+		return this.matrix = rotatedMatrix
+	}
+
+	hold() {
+		if (holding) return
+		heldPieceIndex = this.pieceIndex
+		held()
+		holding = true
+	}
 }
