@@ -2,7 +2,7 @@
 This is my second attempt at creating a game of tetris, and I am very happy with the results!
 So here is what's changed:
 
-##Bug fixes
+##Bug fixes: \n
 *Clearing lines behavior is no longer wrong
 *Rotation related bugs have been fixed
 
