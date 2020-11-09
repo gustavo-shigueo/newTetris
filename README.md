@@ -13,4 +13,4 @@ So here is what's changed:
 * OOP has been better implemented
 
 Note: all of my comments have a '?' in the beggining.
-That's because I use the Better Comments extension for VS Code, which makes thos comments blue in my IDE
+That's because I use the Better Comments extension for VS Code, which makes those comments blue in my IDE
