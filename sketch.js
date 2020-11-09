@@ -16,15 +16,17 @@ function draw() {
   if (keyIsDown(DOWN_ARROW) && !piece.checkDownWardsCollision()) piece.update()
   if(!piece.checkDownWardsCollision()) piece.update()
   else {
-    if (board.usedPlaces.some(v => v[2] === 0)) {
+    piece.collideDownWards()
+    board.getClearedLines()
+    if (board.usedPlaces.some(place => place[2] === 0)) {
       gameOver()
       highscore = max(score, highscore)
       noLoop()
     }
-    piece.collideDownWards()
-    board.getClearedLines()
-    piece = new Piece(nextPieceIndex)
-    next()
+    else {
+      piece = new Piece(nextPieceIndex)
+      next()
+    }
     holding = false
   }
   piece.show()
