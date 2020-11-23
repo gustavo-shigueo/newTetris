@@ -1,12 +1,11 @@
 class Piece {
 	constructor(pieceIndex = nextPieceIndex, x, y) {
 		// ? Position of the current piece
-		this.x = x || (widthBoard - 2 * gridSize) / 2
-		this.y = y || -4 * gridSize
+		this.x = x ?? (widthBoard - 2 * gridSize) / 2
+		this.y = y ?? -4 * gridSize
 
 		// ? Type of piece (check pieces in constants.js for reference)
-		this.pieceIndex = pieceIndex !== null ? pieceIndex : floor(random(0, 7))
-		if (this.pieceIndex === 7) this.pieceIndex = 6
+		this.pieceIndex = pieceIndex ?? pieces.indexOf(random(pieces))
 		this.piece = pieces[this.pieceIndex]
 
 		// ? Shortcut variables to avoid typing 'this.piece.matrix' and 'this.piece.matrix.length' all over the file

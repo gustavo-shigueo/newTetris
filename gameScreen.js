@@ -1,7 +1,6 @@
 // ? Choose next piece
 function next() {
-	nextPieceIndex = floor(random(0, 7))
-	if (nextPieceIndex === 7) nextPieceIndex = 6
+	nextPieceIndex = pieces.indexOf(random(pieces))
 	let pos = findPos(nextPieceIndex)
 	nextPiece = new Piece(nextPieceIndex, (12 + pos[0]) * gridSize, (2 + pos[1]) * gridSize)
 }
