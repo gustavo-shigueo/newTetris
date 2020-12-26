@@ -15,9 +15,16 @@ class Piece {
 		// ? Input filter
 		this.acceptedMoves = {
 			'ArrowLeft': 'left',
+			'A': 'left',
+			'a': 'left',
 			'ArrowRight': 'right',
+			'D': 'right',
+			'd': 'right',
 			'ArrowUp': 'up',
+			'W': 'up',
+			'w': 'up',
 			' ': 'spacebar',
+			'C': 'hold',
 			'c': 'hold'
 		}
 	}
