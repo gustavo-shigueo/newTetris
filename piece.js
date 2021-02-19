@@ -30,7 +30,7 @@ class Piece {
 	}
 
 	update() {
-		this.y += gridSize
+		if (buffer === 10) this.y += velocity
 		return
 	}
 
@@ -75,7 +75,7 @@ class Piece {
 				this.rotate()
 				break
 			case 'spacebar':
-				while (!this.checkDownWardsCollision()) draw()
+				while (!this.checkDownWardsCollision()) this.update()
 				break
 			case 'hold':
 				this.hold()
@@ -84,17 +84,22 @@ class Piece {
 		}
 	}
 
-	possibleToMove(movement) {
-		for (let row = 0; row < this.len; row++)
+	possibleToMove(movement, matrix = this.matrix) {
+		for (let row = 0; row < this.len; row++) {
 			for (let col = 0; col < this.len; col++) {
-				if (!this.matrix[row][col]) continue
+				if (!matrix[row][col]) continue
 				const direction = movement === 'right' ? 1 : -1
 				const moveIsBlocked = board.usedPlaces.some(
-					place => place[1] === this.x + (col + direction) * gridSize && place[2] === this.y + row * gridSize
+					place => (
+						place[1] === this.x + (col + direction) * gridSize &&
+						place[2] > this.y + (row - 1) * gridSize &&
+						place[2] < this.y + (row + 1) * gridSize
+					)
 				)
 				const moveHitsWall = this.x + col * gridSize === (movement === 'right' ? widthBoard - gridSize : 0)
 				if (moveHitsWall || moveIsBlocked) return
 			}
+		}
 		return true
 	}
 
@@ -105,40 +110,49 @@ class Piece {
 
 	rotate() {
 		let rotatedMatrix = []
-		
+
 		// ? Adds a copy this.matrix rotated 90 degrees to the right to rotatedMatrix
 		// ? This process does not affect this.matrix
 		for (let row = 0; row < this.len; row++) {
 			rotatedMatrix.push(Array(this.len))
 			let k = this.len - 1
 			for (let col = 0; col < this.len; col++) {
-					rotatedMatrix[row][col] = this.matrix[k][row]
-					k--
+				rotatedMatrix[row][col] = this.matrix[k][row]
+				k--
 			}
 		}
 
 		// ? Checks if rotatedMatrix is in a valid position
-		for (let row = 0; row < this.len; row++)
+		for (let row = 0; row < this.len; row++) {
 			for (let col = 0; col < this.len; col++) {
-				// ? Only run the tests below if rotatedMatrix is truthy
+				// ? Only run the tests below if rotatedMatrix[row][col] is truthy
 				if (!rotatedMatrix[row][col]) continue
 
-				// ? Checks if rotation causes the piece to collide with other pieces or the floor
-				const isGoingThroughFloor = this.y + row * gridSize === heightBoard - 2 * gridSize
+				// ? Checks if rotation causes the piece to collide with other pieces or with the floor
+				const isGoingThroughFloor = this.y + row * gridSize === heightBoard - gridSize
 				const isGoingThroughPlace = board.usedPlaces.some(
-					place => place[1] === this.x + col * gridSize && place[2] === this.y + (row - 1) * gridSize
+					place => (
+						place[1] === this.x + col * gridSize &&
+						place[2] > this.y + (row - 1) * gridSize &&
+						place[2] < this.y + (row + 1) * gridSize
+					)
 				)
 
 				// ? If any of the tests return true, abort the rotation
 				if (isGoingThroughFloor || isGoingThroughPlace) return
 
 				// ? Prevents rotation from causing the piece to go through walls
-				if (this.x + col * gridSize <= 0) this.x = 0
-				else if (this.x + col * gridSize >= widthBoard - gridSize) this.x = widthBoard - rotatedMatrix.length * gridSize
+				if (this.x + col * gridSize < 0) {
+					if (!this.possibleToMove('right', rotatedMatrix)) return
+					this.move('right')
+				} else if (this.x + col * gridSize > widthBoard - gridSize) {
+					if (!this.possibleToMove('left', rotatedMatrix)) return
+					this.move('left')
+				}
 			}
+		}
 
 		// ? Rotation didn't cause problems
-		this.y -= gridSize
 		return this.matrix = rotatedMatrix
 	}
 

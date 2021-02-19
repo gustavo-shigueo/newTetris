@@ -1,9 +1,10 @@
-const gridSize     = 30             // ? Size (pixels) of a square in the grid
+const gridSize     = 30           // ? Size (pixels) of a square in the grid
 const widthCanvas  = 19 * gridSize
 const heigthCanvas = 20 * gridSize
 const widthBoard   = 10 * gridSize
 const heightBoard  = 20 * gridSize
-const framerate    = 8              // ? Determines the game speed, recommend values smaller than 10
+const framerate    = 30
+const velocity     = gridSize / 5 // ? Must be an integer submultiple of gridSize
 
 const scoreCounter = document.querySelector('#score')
 const highScoreCounter = document.querySelector('#highscore')
@@ -17,6 +18,8 @@ let highscore = 0
 let holding = false
 let nextPieceIndex
 let heldPieceIndex
+
+let buffer = 10
 
 // ? pIndex and name properties are not actually used anywhere,
 // ? they here only to make it easier to know a piece's shape without looking at the matrix and 

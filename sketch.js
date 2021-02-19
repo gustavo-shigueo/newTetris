@@ -14,23 +14,28 @@ function setup() {
 function draw() {
   background(0);
   if (keyIsDown(DOWN_ARROW) && !piece.checkDownWardsCollision()) piece.update()
-  if(!piece.checkDownWardsCollision()) piece.update()
-  else {
-    piece.collideDownWards()
-    board.getClearedLines()
-    if (board.usedPlaces.some(place => place[2] === 0)) {
-      gameOver()
-      highscore = max(score, highscore)
-      noLoop()
+  if(piece.checkDownWardsCollision()) {
+    buffer--
+    if (buffer === 0) {
+      buffer = 10
+      piece.collideDownWards()
+      board.getClearedLines()
+      if (board.usedPlaces.some(place => place[2] === 0)) {
+        gameOver()
+        highscore = max(score, highscore)
+        noLoop()
+      } else {
+        piece = new Piece(nextPieceIndex)
+        next()
+      }
+      holding = false
     }
-    else {
-      piece = new Piece(nextPieceIndex)
-      next()
-    }
-    holding = false
+  } else {
+    buffer = 10
+    piece.update()
   }
-  piece.show()
   board.show()
+  piece.show()
   nextPiece.show()
   if(heldPiece) heldPiece.show()
   push()
